@@ -1,0 +1,31 @@
+# INTEGRATION PATCH-05
+# Defect:    DEFECT-07 — GenerateEmbeddingsJob dispatches to 'embed' queue; no U1 worker listens
+# Severity:  FATAL
+# Root Cause: U3 GenerateEmbeddingsJob sets $this->onQueue('embed') in constructor.
+#             U1 docker-compose.yml queue-worker-ai listens to '--queue=embedding,ai-generation'.
+#             Queue name 'embed' (U3) != 'embedding' (U1). Jobs pile up, never consumed.
+#             U3 QUEUE_ARCHITECTURE.md also specifies correct queue name as 'embed'.
+#             U1 named its queue 'embedding' — a different name.
+# Resolution: Update U1 queue-worker-ai command to include 'embed' in its listen list.
+#             Also retain 'embedding' and 'ai-generation' for forward compatibility.
+#             This is an infrastructure config patch only — no application code change.
+# Files Modified: infrastructure/docker-compose.yml (queue-worker-ai command)
+# Compatibility: Additive — worker now listens to more queues, never fewer.
+# Merge Risk: VERY LOW — adding queue name to listen list only.
+#
+# BEFORE (U1 original):
+#   command: ["php", "artisan", "queue:work", "--queue=embedding,ai-generation", ...]
+#
+# AFTER (PATCH-05):
+#   command: ["php", "artisan", "queue:work", "--queue=embed,embedding,ai-generation", ...]
+
+services:
+  queue-worker-ai:
+    command:
+      - "php"
+      - "artisan"
+      - "queue:work"
+      - "--queue=embed,embedding,ai-generation"
+      - "--tries=3"
+      - "--timeout=300"
+      - "--sleep=1"
