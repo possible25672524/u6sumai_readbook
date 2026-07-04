@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0F172A" />
+  <title>ออฟไลน์ — AI Study Assistant</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    body {
+      font-family: 'Noto Sans Thai', system-ui, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      color: #f8fafc;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 1.5rem;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+      backdrop-filter: blur(12px);
+    }
+    .icon { font-size: 3.5rem; margin-bottom: 1rem; display: block }
+    h1 { font-size: 1.35rem; font-weight: 600; margin-bottom: 0.5rem }
+    p { font-size: 0.875rem; color: #94a3b8; line-height: 1.6; margin-bottom: 1.5rem }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.4);
+      color: #a5b4fc; border-radius: 2rem; padding: 0.3rem 1rem;
+      font-size: 0.75rem; margin-bottom: 1.5rem;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #f59e0b; animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.3 } }
+    button {
+      background: #6366f1; color: #fff; border: none;
+      border-radius: 0.75rem; padding: 0.65rem 1.5rem;
+      font-size: 0.875rem; font-weight: 500; cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover { background: #4f46e5 }
+    .hint { margin-top: 1rem; font-size: 0.75rem; color: #64748b }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="icon">📡</span>
+    <div class="badge"><span class="dot"></span>ออฟไลน์</div>
+    <h1>ไม่มีการเชื่อมต่ออินเทอร์เน็ต</h1>
+    <p>
+      ขณะนี้คุณกำลังใช้งานแบบออฟไลน์<br/>
+      เนื้อหาที่เคยโหลดไว้ยังใช้งานได้<br/>
+      หน้านี้จะโหลดใหม่เมื่อมีการเชื่อมต่อ
+    </p>
+    <button onclick="window.location.reload()">
+      ลองเชื่อมต่อใหม่
+    </button>
+    <p class="hint">Flash Cards และเนื้อหาที่แคชไว้ยังใช้งานได้แบบออฟไลน์</p>
+  </div>
+
+  <script>
+    // Auto-reconnect check every 10s
+    setInterval(() => {
+      if (navigator.onLine) window.location.href = '/'
+    }, 10000)
+
+    window.addEventListener('online', () => {
+      window.location.href = '/'
+    })
+  </script>
+</body>
+</html>
