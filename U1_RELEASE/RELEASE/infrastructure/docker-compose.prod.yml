@@ -1,0 +1,83 @@
+# =============================================================================
+# docker-compose.prod.yml  —  OPTIONAL PRODUCTION OVERLAY
+# =============================================================================
+# Layer this on top of the (already production-safe) base file for things
+# that are safe to express as an *overlay* under Compose's merge rules:
+# scalar fields (logging driver, resource limits as maps) merge/override
+# cleanly. List fields like `ports`/`volumes` do NOT (Compose concatenates
+# them), which is exactly why port-hiding/bind-mount-removal live in the
+# *base* file instead of here — see docker-compose.yml's header comment.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# (Do not also load docker-compose.override.yml in this mode — see
+# DEPLOYMENT.md "Production deploy" section.)
+# =============================================================================
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  backend:
+    restart: always
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+
+  nginx:
+    restart: always
+    logging: *default-logging
+
+  frontend:
+    restart: always
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  mariadb:
+    restart: always
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  redis:
+    restart: always
+    logging: *default-logging
+
+  chromadb:
+    restart: always
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  minio:
+    restart: always
+    logging: *default-logging
+
+  queue-worker-ocr:
+    logging: *default-logging
+    # Scale CPU-bound OCR workers independently, e.g.:
+    #   docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+    #     up -d --scale queue-worker-ocr=3
+
+  queue-worker-ai:
+    logging: *default-logging
+
+  queue-worker-default:
+    logging: *default-logging
